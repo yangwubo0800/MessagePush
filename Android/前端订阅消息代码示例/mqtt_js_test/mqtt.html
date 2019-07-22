@@ -1,0 +1,74 @@
+<html>
+
+<body>
+<h1>ActiveMq消息推送前端示例demo</h1>
+
+<script type="text/javascript" src="paho-mqtt.js"></script>
+<script type="text/javascript">
+document.write("<h1>Hello World!</h1>")
+  window.onload = function(){
+	var client = new Paho.MQTT.Client("127.0.0.1", Number("8883"), "clientIdJSJS");
+	// set callback handlers
+	client.onConnectionLost = onConnectionLost;
+	client.onMessageArrived = onMessageArrived;
+
+	// connect the client
+	var connectOptions = {
+	timeout:1000,
+	userName:"admin",
+	password:"password",
+	keepAliveInterval:10,
+	cleanSession:false,
+	onSuccess:onConnect
+	
+	}
+	client.connect(connectOptions);
+
+	// called when the client connects
+	function onConnect() {
+	  // Once a connection has been made, make a subscription and send a message.
+	  console.log("onConnect");
+	  //client.subscribe("World");
+	  //message = new Paho.MQTT.Message("Hello");
+	  //message.destinationName = "World";
+	  //client.send(message);
+	  var subscribeOptions = {
+	  qos:1,
+
+	  onSuccess:onSubsribeSuccess,
+	  onFailure:onSubsribeFail,
+	  timeout:10
+	  }
+	  
+	  client.subscribe("Main/Sub", subscribeOptions);
+	  
+	}
+	
+	function onSubsribeSuccess(invocationContext){
+	console.log("onSubsribeSuccess invocationContext=" + invocationContext);
+	}
+	
+	function onSubsribeFail(invocationContext){
+	console.log("onSubsribeFail invocationContext="+ invocationContext);
+	}
+
+	// called when the client loses its connection
+	function onConnectionLost(responseObject) {
+	  if (responseObject.errorCode !== 0) {
+		console.log("onConnectionLost:"+responseObject.errorMessage);
+	  }
+	}
+
+	// called when a message arrives
+	function onMessageArrived(message) {
+	  console.log("onMessageArrived:"+message.payloadString);
+	  //alert("你好，我是一个警告框！"+ "\n" + message.payloadString);
+	}
+
+  };
+    
+</script> 
+
+</body>
+
+</html>
